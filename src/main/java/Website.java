@@ -19,7 +19,6 @@ public class Website extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         String param = req.getParameter("req");
         if (param != null && param.equals("list")) {
-            System.out.println(getAllIngredientsList());
             writer.print(getAllIngredientsList());
         } else if (param != null && param.equals("recipes")) {
             JSONArray recipes =
@@ -63,7 +62,6 @@ public class Website extends HttpServlet {
         try {
             while (result.next()) {
                 JSONObject obj = new JSONObject();
-                System.out.println(result.getShort("name"));
                 obj.put("name", result.getString("name"));
                 obj.put("duration", result.getString("duration"));
                 ingredients.add(obj);

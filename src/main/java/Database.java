@@ -13,7 +13,7 @@ public class Database {
     
     // Gets a list of all ingredients appearing in the database
     public static ResultSet getAllIngredientsList() {
-        String query = "SELECT name, duration FROM ingredients";
+        String query = "SELECT name, duration FROM ingredients;";
         return queryDatabase(query);
     }
     
@@ -31,7 +31,7 @@ public class Database {
     private static ResultSet getIngredientIds(String ingredientsList) {
         final String query =
             "SELECT id FROM ingredients WHERE name IN (" + ingredientsList +
-                ")";
+                ");";
         return queryDatabase(query);
     }
     
@@ -44,7 +44,7 @@ public class Database {
             + "AND (d.id NOT IN "
                 + "(SELECT DISTINCT d.id "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
-                + "WHERE r.ingr_id NOT IN (" + ingredientsIdsList + ")))";
+                + "WHERE r.ingr_id NOT IN (" + ingredientsIdsList + ")));";
         return queryDatabase(query);
     }
     
@@ -54,7 +54,7 @@ public class Database {
     private static Recipe getRecipeInformation(String recipeId) {
         final String query =
             "SELECT name, directions, image "
-                + "FROM dishes WHERE d.id = " + recipeId;
+                + "FROM dishes WHERE d.id = " + recipeId + ";";
         ResultSet result = queryDatabase(query);
         Recipe recipeInfo = null;
         try {
@@ -73,7 +73,7 @@ public class Database {
         final String query =
             "SELECT name, quantity, unit, duration "
                 + "FROM recipes r JOIN ingredients i ON (r.ingr_id = i.id) "
-                + "WHERE r.dish_id = " + recipeId;
+                + "WHERE r.dish_id = " + recipeId + ";";
         ResultSet result = queryDatabase(query);
         List<Ingredient> ingredients = new ArrayList<>();
         try {
@@ -94,17 +94,13 @@ public class Database {
     private static Connection getConnection() throws URISyntaxException,
         SQLException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
-        
+
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
         String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':'
-            + dbUri.getPort() + dbUri.getPath();
-        
-        System.out.println(System.getenv("DATABASE_URL"));
-        System.out.println(dbUri.getHost());
-        System.out.println(dbUri.getPort());
-        System.out.println(dbUri.getPath());
-        
+            + dbUri.getPort() + dbUri.getPath() +
+            "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+
         return DriverManager.getConnection(dbUrl, username, password);
     }
     
