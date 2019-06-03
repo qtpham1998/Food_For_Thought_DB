@@ -1,0 +1,1 @@
+web: sh target/bin/fft-group3
