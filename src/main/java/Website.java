@@ -18,14 +18,13 @@ public class Website extends HttpServlet {
         resp.setContentType("application/json");
         PrintWriter writer = resp.getWriter();
         String param = req.getParameter("req");
-        if (param.equals("list")) {
+        if (param != null && param.equals("list")) {
+            System.out.println(getAllIngredientsList());
             writer.print(getAllIngredientsList());
-        } else if (param.equals("recipes")) {
+        } else if (param != null && param.equals("recipes")) {
             JSONArray recipes =
                 fetchMatchingRecipes(new JSONArray(req.getParameter("owned")));
             writer.print(recipes);
-        } else {
-            writer.print("Error, invalid parameter \'req\'");
         }
     }
     
@@ -64,6 +63,7 @@ public class Website extends HttpServlet {
         try {
             while (result.next()) {
                 JSONObject obj = new JSONObject();
+                System.out.println(result.getShort("name"));
                 obj.put("name", result.getString("name"));
                 obj.put("duration", result.getString("duration"));
                 ingredients.add(obj);
