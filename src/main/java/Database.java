@@ -100,6 +100,11 @@ public class Database {
         String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':'
             + dbUri.getPort() + dbUri.getPath();
         
+        System.out.println(System.getenv("DATABASE_URL"));
+        System.out.println(dbUri.getHost());
+        System.out.println(dbUri.getPort());
+        System.out.println(dbUri.getPath());
+        
         return DriverManager.getConnection(dbUrl, username, password);
     }
     
