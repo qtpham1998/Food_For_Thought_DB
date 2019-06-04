@@ -20,8 +20,7 @@ public class Website extends HttpServlet {
         String param = req.getParameter("req");
         if (param != null && param.equals("list")) {
             writer.print(getAllIngredientsList());
-        } else if (param != null && param.equals("recipes")) {
-            System.out.println("DEBUGGING:" + req.getParameter("owned"));
+        } else if (param != null && param.equals("recipe")) {
             JSONArray recipes =
                 fetchMatchingRecipes(new JSONArray(req.getParameter("owned")));
             writer.print(recipes);
@@ -50,9 +49,9 @@ public class Website extends HttpServlet {
     // Convert JSONArray owned ingredients list to String
     private String decodeOwnedIngrList(JSONArray list) {
         StringBuilder sb = new StringBuilder();
-        sb.append(list.getString(0));
-        for (int i = 0; i < list.length(); i++)
-            sb.append(list.getString(i));
+        sb.append("\'" + list.getString(0) + "\'");
+        for (int i = 1; i < list.length(); i++)
+            sb.append(", " + "\'" + list.getString(i) + "\'");
         return sb.toString();
     }
     

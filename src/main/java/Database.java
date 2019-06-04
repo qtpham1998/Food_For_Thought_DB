@@ -54,10 +54,11 @@ public class Database {
     private static Recipe getRecipeInformation(String recipeId) {
         final String query =
             "SELECT name, directions, image "
-                + "FROM dishes WHERE d.id = " + recipeId + ";";
+                + "FROM dishes WHERE id = " + recipeId + ";";
         ResultSet result = queryDatabase(query);
         Recipe recipeInfo = null;
         try {
+            result.next();
             recipeInfo = new Recipe(result.getString("name"),
                 result.getString("directions"),
                 result.getString("image"),
@@ -112,7 +113,7 @@ public class Database {
             Statement stmt = conn.createStatement();
             resultSet = stmt.executeQuery(query);
         } catch (SQLException | URISyntaxException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return resultSet;
     }
