@@ -21,6 +21,7 @@ public class Website extends HttpServlet {
         if (param != null && param.equals("list")) {
             writer.print(getAllIngredientsList());
         } else if (param != null && param.equals("recipes")) {
+            System.out.println("DEBUGGING:" + req.getParameter("owned"));
             JSONArray recipes =
                 fetchMatchingRecipes(new JSONArray(req.getParameter("owned")));
             writer.print(recipes);
