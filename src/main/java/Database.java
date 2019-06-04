@@ -112,6 +112,8 @@ public class Database {
             Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             resultSet = stmt.executeQuery(query);
+            conn.close();
+            stmt.close();
         } catch (SQLException | URISyntaxException e) {
             e.printStackTrace();
         }
