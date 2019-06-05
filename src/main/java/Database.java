@@ -13,7 +13,7 @@ public class Database {
     
     // Gets a list of all ingredients appearing in the database
     public static ResultSet getAllIngredientsList() {
-        String query = "SELECT name, duration FROM ingredients;";
+        String query = "SELECT name, category, duration FROM ingredients;";
         return queryDatabase(query);
     }
     

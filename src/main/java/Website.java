@@ -26,7 +26,8 @@ public class Website extends HttpServlet {
             writer.print(recipes);
         }
     }
-    
+    //TODO: Fetch also recipes with missing ingredients.
+    //TODO: Add missing flag, remember to JSON decode/encode
     // Get matching recipes from owned ingredients, in JSON array form
     private JSONArray fetchMatchingRecipes(JSONArray ownedIngredients) {
         String ownedString = decodeOwnedIngrList(ownedIngredients);
@@ -49,8 +50,8 @@ public class Website extends HttpServlet {
     // Convert JSONArray owned ingredients list to String
     private String decodeOwnedIngrList(JSONArray list) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\'" + list.getString(0) + "\'");
-        for (int i = 1; i < list.length(); i++)
+        sb. append("\'Salt\', \'Black pepper\', \'Oil\'");
+        for (int i = 0; i < list.length(); i++)
             sb.append(", " + "\'" + list.getString(i) + "\'");
         return sb.toString();
     }
@@ -63,6 +64,7 @@ public class Website extends HttpServlet {
             while (result.next()) {
                 JSONObject obj = new JSONObject();
                 obj.put("name", result.getString("name"));
+                obj.put("category", result.getString("category"));
                 obj.put("duration", result.getString("duration"));
                 ingredients.add(obj);
             }
