@@ -26,9 +26,7 @@ public class Database {
     
     private static List<Recipe> fetchMatchingRecipes(String ingredientsList) {
         String list = resultColumnToString(getIngredientIds(ingredientsList));
-        String recipesIds = resultColumnToString(searchRecipesIds(list));
-    
-        List<String> idsList = Arrays.asList(recipesIds.split(", "));
+        List<String> idsList = resultColumnToList(searchRecipesIds(list));
         List<Recipe> recipes = new ArrayList<>();
         idsList.forEach(id -> recipes.add(getRecipeInformation(id, 0)));
     
@@ -91,6 +89,7 @@ public class Database {
         return queryDatabase(query);
     }
     
+    
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
@@ -102,7 +101,7 @@ public class Database {
         ResultSet result = queryDatabase(query);
         Recipe recipeInfo = null;
         try {
-            result.next();
+            if (result.next())
             recipeInfo = new Recipe(result.getString("name"),
                 result.getString("directions"),
                 result.getString("image"),
@@ -169,8 +168,7 @@ public class Database {
     private static String resultColumnToString(ResultSet result) {
         StringBuilder sb = new StringBuilder();
         try {
-            result.next();
-            sb.append(result.getString(1));
+            if (result.next()) sb.append(result.getString(1));
             while (result.next()) {
                 sb.append(", " + result.getString(1));
             }
@@ -178,5 +176,19 @@ public class Database {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+    
+    // Converts a column from the result set to a list of element
+    private static List<String> resultColumnToList(ResultSet result) {
+        List<String> list = new ArrayList<>();
+        try {
+            if (result.next()) list.add(result.getString(1));
+            while (result.next()) {
+                list.add(", " + result.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
