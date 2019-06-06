@@ -56,7 +56,7 @@ public class Database {
     // Given a list of ingredients, returns the recipe IDs that use them
     private static ResultSet searchMoreRecipesIds(String ingredientsIdsList) {
         final String query =
-            "SELECT DISTINCT d.id, COUNT(ingr_id) AS missing"
+            "SELECT DISTINCT d.id, COUNT(ingr_id) AS missing "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id) "
                 + "WHERE (r.ingr_id NOT IN (" + ingredientsIdsList + ")) "
                 + "AND (d.id IN "
