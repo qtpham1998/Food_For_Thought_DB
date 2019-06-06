@@ -85,7 +85,8 @@ public class Database {
                 + "(SELECT DISTINCT d.id "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
                 + "WHERE r.ingr_id IN (" + ingredientsIdsList + "))) "
-                + "GROUP BY d.id;";
+                + "GROUP BY d.id "
+                + "HAVING missing < 6;";
         return queryDatabase(query);
     }
     
