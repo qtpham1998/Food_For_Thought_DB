@@ -43,7 +43,7 @@ public class Website extends HttpServlet {
         jsonRecipe.put("directions", recipe.getDirections());
         jsonRecipe.put("image", recipe.getImage());
         jsonRecipe.put("ingredients", recipe.encodeIngredientsList());
-        jsonRecipe.put("missing", recipe.isMissing());
+        jsonRecipe.put("missing", recipe.getMissing());
         return jsonRecipe;
     }
     

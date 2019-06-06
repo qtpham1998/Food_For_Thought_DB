@@ -25,9 +25,9 @@ public class Database {
     
         List<String> idsList = Arrays.asList(recipesIds.split(", "));
         List<Recipe> recipes = new ArrayList<>();
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id, false)));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
         idsList = Arrays.asList(missingRecipesIds.split(", "));
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id, true)));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
     
         return recipes;
     }
@@ -56,21 +56,21 @@ public class Database {
     // Given a list of ingredients, returns the recipe IDs that use them
     private static ResultSet searchMoreRecipesIds(String ingredientsIdsList) {
         final String query =
-            "SELECT DISTINCT d.id "
+            "SELECT DISTINCT d.id, COUNT(ingr_id) AS missing"
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id) "
-                + "WHERE (r.ingr_id IN (" + ingredientsIdsList + ")) "
+                + "WHERE (r.ingr_id NOT IN (" + ingredientsIdsList + ")) "
                 + "AND (d.id IN "
                 + "(SELECT DISTINCT d.id "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
-                + "WHERE r.ingr_id NOT IN (" + ingredientsIdsList + ")));";
+                + "WHERE r.ingr_id IN (" + ingredientsIdsList + ")))"
+                + "GROUP BY d.id;";
         return queryDatabase(query);
     }
     
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
-    private static Recipe getRecipeInformation(String recipeId, boolean
-        missing) {
+    private static Recipe getRecipeInformation(String recipeId) {
         final String query =
             "SELECT name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
@@ -82,7 +82,7 @@ public class Database {
                 result.getString("directions"),
                 result.getString("image"),
                 getRecipeIngredients(recipeId),
-                missing);
+                result.getString("missing"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
