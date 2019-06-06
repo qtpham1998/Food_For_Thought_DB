@@ -8,10 +8,10 @@ public class Recipe {
     private String directions;
     private String image;
     private List<Ingredient> ingredientList;
-    private String missing;
+    private int missing = 0;
     
     Recipe(String name, String directions, String image,
-        List<Ingredient> ingredientList, String missing) {
+        List<Ingredient> ingredientList, int missing) {
         this.name = name;
         this.directions = directions;
         this.image = image;
@@ -33,7 +33,7 @@ public class Recipe {
     }
     
     public String getMissing() {
-        return missing;
+        return String.valueOf(missing);
     }
     
     public JSONArray encodeIngredientsList() {

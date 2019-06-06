@@ -19,15 +19,39 @@ public class Database {
     
     // Gets the recipes with matching ingredients to one in given list
     public static List<Recipe> fetchRecipes(String ingredientsList) {
+        List<Recipe> recipes = fetchMatchingRecipes(ingredientsList);
+        recipes.addAll(fetchMissingRecipes(ingredientsList));
+       return recipes;
+    }
+    
+    private static List<Recipe> fetchMatchingRecipes(String ingredientsList) {
         String list = resultColumnToString(getIngredientIds(ingredientsList));
         String recipesIds = resultColumnToString(searchRecipesIds(list));
-        String missingRecipesIds = resultColumnToString(searchMoreRecipesIds(list));
     
         List<String> idsList = Arrays.asList(recipesIds.split(", "));
         List<Recipe> recipes = new ArrayList<>();
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
-        idsList = Arrays.asList(missingRecipesIds.split(", "));
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id, 0)));
+    
+        return recipes;
+    }
+    
+    private static List<Recipe> fetchMissingRecipes(String ingredientsList) {
+        String list = resultColumnToString(getIngredientIds(ingredientsList));
+        ResultSet resultSet = searchMoreRecipesIds(list);
+        List<Recipe> recipes = new ArrayList<>();
+    
+       try {
+           while (resultSet.next()) {
+               recipes.add(
+                   getRecipeInformation(
+                       resultSet.getString("id"),
+                       resultSet.getInt("missing")
+                   )
+               );
+           }
+       } catch (SQLException e) {
+           e.printStackTrace();
+       }
     
         return recipes;
     }
@@ -56,13 +80,13 @@ public class Database {
     // Given a list of ingredients, returns the recipe IDs that use them
     private static ResultSet searchMoreRecipesIds(String ingredientsIdsList) {
         final String query =
-            "SELECT DISTINCT d.id, COUNT(ingr_id) AS missing "
+            "SELECT d.id, COUNT(ingr_id) AS missing "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id) "
                 + "WHERE (r.ingr_id NOT IN (" + ingredientsIdsList + ")) "
                 + "AND (d.id IN "
                 + "(SELECT DISTINCT d.id "
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
-                + "WHERE r.ingr_id IN (" + ingredientsIdsList + ")))"
+                + "WHERE r.ingr_id IN (" + ingredientsIdsList + "))) "
                 + "GROUP BY d.id;";
         return queryDatabase(query);
     }
@@ -70,7 +94,8 @@ public class Database {
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
-    private static Recipe getRecipeInformation(String recipeId) {
+    private static Recipe getRecipeInformation(String recipeId,
+        int missing) {
         final String query =
             "SELECT name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
@@ -82,7 +107,7 @@ public class Database {
                 result.getString("directions"),
                 result.getString("image"),
                 getRecipeIngredients(recipeId),
-                result.getString("missing"));
+                missing);
         } catch (SQLException e) {
             e.printStackTrace();
         }
