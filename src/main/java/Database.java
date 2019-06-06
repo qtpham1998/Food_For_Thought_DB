@@ -86,7 +86,7 @@ public class Database {
                 + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
                 + "WHERE r.ingr_id IN (" + ingredientsIdsList + "))) "
                 + "GROUP BY d.id "
-                + "HAVING missing < 6;";
+                + "HAVING COUNT(ingr_id) < 6;";
         return queryDatabase(query);
     }
     
