@@ -21,9 +21,14 @@ public class Database {
     public static List<Recipe> fetchRecipes(String ingredientsList) {
         String list = resultColumnToString(getIngredientIds(ingredientsList));
         String recipesIds = resultColumnToString(searchRecipesIds(list));
+        String missingRecipesIds = resultColumnToString(searchMoreRecipesIds(list));
+    
         List<String> idsList = Arrays.asList(recipesIds.split(", "));
         List<Recipe> recipes = new ArrayList<>();
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id, false)));
+        idsList = Arrays.asList(missingRecipesIds.split(", "));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id, true)));
+    
         return recipes;
     }
     
@@ -35,7 +40,7 @@ public class Database {
         return queryDatabase(query);
     }
     
-    // Given a list of ingredients, returns the recipe IDs that use them
+    // Given a list of ingredients, returns the recipe IDs that use only them
     private static ResultSet searchRecipesIds(String ingredientsIdsList) {
         final String query =
             "SELECT DISTINCT d.id "
@@ -48,10 +53,24 @@ public class Database {
         return queryDatabase(query);
     }
     
+    // Given a list of ingredients, returns the recipe IDs that use them
+    private static ResultSet searchMoreRecipesIds(String ingredientsIdsList) {
+        final String query =
+            "SELECT DISTINCT d.id "
+                + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id) "
+                + "WHERE (r.ingr_id IN (" + ingredientsIdsList + ")) "
+                + "AND (d.id IN "
+                + "(SELECT DISTINCT d.id "
+                + "FROM dishes d JOIN recipes r ON (d.id = r.dish_id)"
+                + "WHERE r.ingr_id NOT IN (" + ingredientsIdsList + ")));";
+        return queryDatabase(query);
+    }
+    
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
-    private static Recipe getRecipeInformation(String recipeId) {
+    private static Recipe getRecipeInformation(String recipeId, boolean
+        missing) {
         final String query =
             "SELECT name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
@@ -62,7 +81,8 @@ public class Database {
             recipeInfo = new Recipe(result.getString("name"),
                 result.getString("directions"),
                 result.getString("image"),
-                getRecipeIngredients(recipeId));
+                getRecipeIngredients(recipeId),
+                missing);
         } catch (SQLException e) {
             e.printStackTrace();
         }

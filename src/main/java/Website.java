@@ -26,8 +26,7 @@ public class Website extends HttpServlet {
             writer.print(recipes);
         }
     }
-    //TODO: Fetch also recipes with missing ingredients.
-    //TODO: Add missing flag, remember to JSON decode/encode
+
     // Get matching recipes from owned ingredients, in JSON array form
     private JSONArray fetchMatchingRecipes(JSONArray ownedIngredients) {
         String ownedString = decodeOwnedIngrList(ownedIngredients);
@@ -44,6 +43,7 @@ public class Website extends HttpServlet {
         jsonRecipe.put("directions", recipe.getDirections());
         jsonRecipe.put("image", recipe.getImage());
         jsonRecipe.put("ingredients", recipe.encodeIngredientsList());
+        jsonRecipe.put("missing", recipe.isMissing());
         return jsonRecipe;
     }
     

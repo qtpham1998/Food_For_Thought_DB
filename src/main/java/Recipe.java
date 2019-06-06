@@ -8,13 +8,15 @@ public class Recipe {
     private String directions;
     private String image;
     private List<Ingredient> ingredientList;
+    private boolean missing;
     
     Recipe(String name, String directions, String image,
-        List<Ingredient> ingredientList) {
+        List<Ingredient> ingredientList, boolean missing) {
         this.name = name;
         this.directions = directions;
         this.image = image;
         this.ingredientList = ingredientList;
+        this.missing = missing;
     }
     
     
@@ -28,6 +30,10 @@ public class Recipe {
     
     public String getImage() {
         return image;
+    }
+    
+    public String isMissing() {
+        return String.valueOf(missing);
     }
     
     public JSONArray encodeIngredientsList() {
