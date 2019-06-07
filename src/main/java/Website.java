@@ -63,6 +63,7 @@ public class Website extends HttpServlet {
         try {
             while (result.next()) {
                 JSONObject obj = new JSONObject();
+                obj.put("id", result.getString("id"));
                 obj.put("name", result.getString("name"));
                 obj.put("category", result.getString("category"));
                 obj.put("duration", result.getString("duration"));

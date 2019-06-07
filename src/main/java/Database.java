@@ -6,14 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Database {
     
     // Gets a list of all ingredients appearing in the database
     public static ResultSet getAllIngredientsList() {
-        String query = "SELECT name, category, duration FROM ingredients;";
+        String query = "SELECT id, name, category, duration FROM ingredients;";
         return queryDatabase(query);
     }
     
