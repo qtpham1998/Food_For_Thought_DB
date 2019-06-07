@@ -89,11 +89,23 @@ public class Database {
         return queryDatabase(query);
     }
     
+    public static String getRecipeIdFromName(String recipe) {
+        final String query =
+            "SELECT id FROM dishes WHERE name = " + recipe + ";";
+        ResultSet result = queryDatabase(query);
+        try {
+            result.next();
+            return result.getString("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
-    private static Recipe getRecipeInformation(String recipeId,
+    public static Recipe getRecipeInformation(String recipeId,
         int missing) {
         final String query =
             "SELECT name, directions, image "
