@@ -185,7 +185,7 @@ public class Database {
         try {
             if (result.next()) list.add(result.getString(1));
             while (result.next()) {
-                list.add(", " + result.getString(1));
+                list.add(result.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
