@@ -26,7 +26,7 @@ public class Website extends HttpServlet {
             writer.print(recipes);
         } else if (param != null && param.equals("liked")) {
             JSONArray likedRecipes =
-                fetchLikedRecipes(new JSONArray(req.getParameter("name")));
+                fetchLikedRecipes(new JSONArray(req.getParameter("ids")));
             writer.print(likedRecipes);
         }
     }
@@ -43,8 +43,8 @@ public class Website extends HttpServlet {
     private JSONArray fetchLikedRecipes(JSONArray likedList) {
         List<JSONObject> likedRecipes = new ArrayList<>();
         for (int i = 0; i < likedList.length(); i++) {
-            likedRecipes.add(Database.getRecipeInformation(likedList
-                .getString(1), 0).encodeRecipe());
+            likedRecipes.add(Database.getRecipeInformation(
+                String.valueOf(likedList.getInt(i)), 0).encodeRecipe());
         }
         return new JSONArray(likedRecipes);
     }
