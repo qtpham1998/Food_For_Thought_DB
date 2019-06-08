@@ -69,7 +69,7 @@ public class Website extends HttpServlet {
                 obj.put("id", result.getInt("id"));
                 obj.put("name", result.getString("name"));
                 obj.put("category", result.getString("category"));
-                obj.put("duration", result.getString("duration"));
+                obj.put("duration", result.getInt("duration"));
                 ingredients.add(obj);
             }
         } catch (SQLException ignored) {}
