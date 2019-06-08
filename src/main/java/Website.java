@@ -25,8 +25,9 @@ public class Website extends HttpServlet {
                 fetchMatchingRecipes(new JSONArray(req.getParameter("owned")));
             writer.print(recipes);
         } else if (param != null && param.equals("liked")) {
+            String name = req.getParameter("name").replace("\"", "\'");
             Recipe recipe = Database.getRecipeInformation(
-                Database.getRecipeIdFromName(req.getParameter("name")), 0);
+                Database.getRecipeIdFromName(name), 0);
             writer.print(encodeRecipe(recipe));
         }
     }

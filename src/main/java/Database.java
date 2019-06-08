@@ -89,11 +89,14 @@ public class Database {
         return queryDatabase(query);
     }
     
+    // Get a recipe info given its name
     public static String getRecipeIdFromName(String recipe) {
         final String query =
             "SELECT id FROM dishes WHERE name = " + recipe + ";";
+        System.out.println(query);
         ResultSet result = queryDatabase(query);
         try {
+            System.out.println();
             result.next();
             return result.getString("id");
         } catch (SQLException e) {
