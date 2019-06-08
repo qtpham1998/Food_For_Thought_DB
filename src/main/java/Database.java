@@ -89,35 +89,21 @@ public class Database {
         return queryDatabase(query);
     }
     
-    // Get a recipe info given its name
-    public static String getRecipeIdFromName(String recipe) {
-        final String query =
-            "SELECT id FROM dishes WHERE name = " + recipe + ";";
-        System.out.println(query);
-        ResultSet result = queryDatabase(query);
-        try {
-            System.out.println();
-            result.next();
-            return result.getString("id");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
     public static Recipe getRecipeInformation(String recipeId,
         int missing) {
         final String query =
-            "SELECT name, directions, image "
+            "SELECT id, name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
         ResultSet result = queryDatabase(query);
         Recipe recipeInfo = null;
         try {
             if (result.next())
-            recipeInfo = new Recipe(result.getString("name"),
+            recipeInfo = new Recipe(
+                result.getString("id"),
+                result.getString("name"),
                 result.getString("directions"),
                 result.getString("image"),
                 getRecipeIngredients(recipeId),

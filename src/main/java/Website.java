@@ -25,10 +25,9 @@ public class Website extends HttpServlet {
                 fetchMatchingRecipes(new JSONArray(req.getParameter("owned")));
             writer.print(recipes);
         } else if (param != null && param.equals("liked")) {
-            String name = req.getParameter("name").replace("\"", "\'");
-            Recipe recipe = Database.getRecipeInformation(
-                Database.getRecipeIdFromName(name), 0);
-            writer.print(encodeRecipe(recipe));
+            JSONArray likedRecipes =
+                fetchLikedRecipes(new JSONArray(req.getParameter("name")));
+            writer.print(likedRecipes);
         }
     }
 
@@ -37,20 +36,19 @@ public class Website extends HttpServlet {
         String ownedString = decodeOwnedIngrList(ownedIngredients);
         List<Recipe> recipes = Database.fetchRecipes(ownedString);
         List<JSONObject> jsonRecipes = new ArrayList<>();
-        recipes.forEach(recipe -> jsonRecipes.add(encodeRecipe(recipe)));
+        recipes.forEach(recipe -> jsonRecipes.add(recipe.encodeRecipe()));
         return new JSONArray(jsonRecipes);
     }
     
-    // Encode one recipe into a JSON object
-    private JSONObject encodeRecipe(Recipe recipe) {
-        JSONObject jsonRecipe = new JSONObject();
-        jsonRecipe.put("name", recipe.getName());
-        jsonRecipe.put("directions", recipe.getDirections());
-        jsonRecipe.put("image", recipe.getImage());
-        jsonRecipe.put("ingredients", recipe.encodeIngredientsList());
-        jsonRecipe.put("missing", recipe.getMissing());
-        return jsonRecipe;
+    private JSONArray fetchLikedRecipes(JSONArray likedList) {
+        List<JSONObject> likedRecipes = new ArrayList<>();
+        for (int i = 0; i < likedList.length(); i++) {
+            likedRecipes.add(Database.getRecipeInformation(likedList
+                .getString(1), 0).encodeRecipe());
+        }
+        return new JSONArray(likedRecipes);
     }
+    
     
     // Convert JSONArray owned ingredients list to String
     private String decodeOwnedIngrList(JSONArray list) {
