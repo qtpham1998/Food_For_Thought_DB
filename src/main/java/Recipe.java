@@ -4,16 +4,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Recipe {
-    private String id;
+    private int id;
     private String name;
     private String directions;
     private String image;
     private List<Ingredient> ingredientList;
-    private int missing = 0;
+    private int missing;
     
     Recipe(String id, String name, String directions, String image,
         List<Ingredient> ingredientList, int missing) {
-        this.id = id;
+        this.id = Integer.parseInt(id);
         this.name = name;
         this.directions = directions;
         this.image = image;
