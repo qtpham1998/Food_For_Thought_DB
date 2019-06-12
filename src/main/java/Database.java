@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Database {
@@ -27,7 +28,7 @@ public class Database {
         String list = resultColumnToString(getIngredientIds(ingredientsList));
         List<String> idsList = resultColumnToList(searchRecipesIds(list));
         List<Recipe> recipes = new ArrayList<>();
-        idsList.forEach(id -> recipes.add(getRecipeInformation(id, 0)));
+        idsList.forEach(id -> recipes.add(getRecipeInformation(id)));
     
         return recipes;
     }
@@ -36,13 +37,16 @@ public class Database {
         String list = resultColumnToString(getIngredientIds(ingredientsList));
         ResultSet resultSet = searchMoreRecipesIds(list);
         List<Recipe> recipes = new ArrayList<>();
-    
+        List<String> ownedIngredients =
+            Arrays.asList(ingredientsList.replaceAll("\'", "").split(", "));
+
        try {
            while (resultSet.next()) {
                recipes.add(
                    getRecipeInformation(
                        resultSet.getString("id"),
-                       resultSet.getInt("missing")
+                       resultSet.getInt("missing"),
+                       ownedIngredients
                    )
                );
            }
@@ -92,8 +96,7 @@ public class Database {
     // Given a recipe IDs, returns the recipe's information
     // Includes: recipe name, directions, link to image,
     // name of ingredients, each's quantity and unit
-    public static Recipe getRecipeInformation(String recipeId,
-        int missing) {
+    public static Recipe getRecipeInformation(String recipeId) {
         final String query =
             "SELECT id, name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
@@ -107,7 +110,30 @@ public class Database {
                 result.getString("directions"),
                 result.getString("image"),
                 getRecipeIngredients(recipeId),
-                missing);
+                0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recipeInfo;
+    }
+    
+    // Same as above, but with missing ingredients information
+    public static Recipe getRecipeInformation(String recipeId,
+        int missing,  List<String> ownedIngredients) {
+        final String query =
+            "SELECT id, name, directions, image "
+                + "FROM dishes WHERE id = " + recipeId + ";";
+        ResultSet result = queryDatabase(query);
+        Recipe recipeInfo = null;
+        try {
+            if (result.next())
+                recipeInfo = new Recipe(
+                    result.getString("id"),
+                    result.getString("name"),
+                    result.getString("directions"),
+                    result.getString("image"),
+                    getRecipeIngredients(recipeId, ownedIngredients),
+                    missing);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -128,6 +154,31 @@ public class Database {
                     result.getString("name"),
                     result.getString("quantity"),
                     result.getString("unit")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ingredients;
+    }
+    
+    // Same as above, but with missing ingredients information
+    private static List<Ingredient> getRecipeIngredients(String recipeId,
+        List<String> ownedIngredients) {
+        final String query =
+            "SELECT name, quantity, unit, duration "
+                + "FROM recipes r JOIN ingredients i ON (r.ingr_id = i.id) "
+                + "WHERE r.dish_id = " + recipeId + ";";
+        ResultSet result = queryDatabase(query);
+        List<Ingredient> ingredients = new ArrayList<>();
+        try {
+            while (result.next()) {
+                String name = result.getString("name");
+                ingredients.add(new Ingredient(
+                    name,
+                    result.getString("quantity"),
+                    result.getString("unit"),
+                    Ingredient.isIngredientMissing(name, ownedIngredients)
                 ));
             }
         } catch (SQLException e) {

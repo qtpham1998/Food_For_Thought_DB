@@ -44,7 +44,7 @@ public class Website extends HttpServlet {
         List<JSONObject> likedRecipes = new ArrayList<>();
         for (int i = 0; i < likedList.length(); i++) {
             likedRecipes.add(Database.getRecipeInformation(
-                String.valueOf(likedList.getInt(i)), 0).encodeRecipe());
+                String.valueOf(likedList.getInt(i))).encodeRecipe());
         }
         return new JSONArray(likedRecipes);
     }
