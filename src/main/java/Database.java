@@ -223,7 +223,7 @@ public class Database {
             : recipe.getImage();
         final String insert = "INSERT INTO dishes VALUES "
             + "(" + id + ", \'" + recipe.getName() + "\', \'" + recipe
-            .getDirections().replaceAll("\n", "\\n") + "\', \'" + image +
+            .getDirections() + "\', \'" + image +
             "\');";
         queryDatabase(insert);
         insertIngredientsUsed(id, recipe.getIngredientList());
@@ -255,6 +255,7 @@ public class Database {
             "SELECT COUNT(*) AS idNum FROM dishes;";
         ResultSet result = queryDatabase(query);
         try {
+            result.next();
             return result.getInt("idNum") + 1;
         } catch (SQLException e) {
             e.printStackTrace();

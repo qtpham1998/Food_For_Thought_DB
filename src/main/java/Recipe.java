@@ -55,12 +55,13 @@ public class Recipe {
     }
     
     public static Recipe decodeRecipe(JSONObject jsonObject) {
+        System.out.println(new JSONArray(jsonObject.getString("ingredients")));
         return new Recipe(
             jsonObject.getString("name"),
             jsonObject.getString("directions"),
             jsonObject.getString("image"),
-            Ingredient.decodeUsedIngredientsList(jsonObject.getJSONArray
-                ("ingredients"))
+            Ingredient.decodeUsedIngredientsList(
+                new JSONArray(jsonObject.getString("ingredients")))
         );
     }
     

@@ -52,7 +52,7 @@ public class Ingredient {
     public static List<Ingredient> decodeUsedIngredientsList(JSONArray jsonArray) {
         List<Ingredient> ingredientsUsed = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject ingredient = new JSONObject(jsonArray.get(i));
+            JSONObject ingredient = new JSONObject(jsonArray.getString(i));
             ingredientsUsed.add(decodeUsedIngredient(ingredient));
         }
         return ingredientsUsed;
