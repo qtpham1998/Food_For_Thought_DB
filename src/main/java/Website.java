@@ -28,6 +28,10 @@ public class Website extends HttpServlet {
             JSONArray likedRecipes =
                 fetchLikedRecipes(new JSONArray(req.getParameter("ids")));
             writer.print(likedRecipes);
+        } else if (param != null && param.equals("new")) {
+            Database.insertNewRecipe(Recipe.decodeRecipe(
+                new JSONObject(req.getParameter("recipe"))
+            ));
         }
     }
 
@@ -55,7 +59,7 @@ public class Website extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb. append("\'Salt\', \'Black pepper\', \'Oil\'");
         for (int i = 0; i < list.length(); i++)
-            sb.append(", " + "\'" + list.getString(i) + "\'");
+            sb.append(", \'").append(list.getString(i)).append("\'");
         return sb.toString();
     }
     

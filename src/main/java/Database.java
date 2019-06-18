@@ -105,7 +105,7 @@ public class Database {
         try {
             if (result.next())
             recipeInfo = new Recipe(
-                result.getString("id"),
+                result.getInt("id"),
                 result.getString("name"),
                 result.getString("directions"),
                 result.getString("image"),
@@ -118,8 +118,8 @@ public class Database {
     }
     
     // Same as above, but with missing ingredients information
-    public static Recipe getRecipeInformation(String recipeId,
-        int missing,  List<String> ownedIngredients) {
+    private static Recipe getRecipeInformation(String recipeId,
+        int missing, List<String> ownedIngredients) {
         final String query =
             "SELECT id, name, directions, image "
                 + "FROM dishes WHERE id = " + recipeId + ";";
@@ -128,7 +128,7 @@ public class Database {
         try {
             if (result.next())
                 recipeInfo = new Recipe(
-                    result.getString("id"),
+                    result.getInt("id"),
                     result.getString("name"),
                     result.getString("directions"),
                     result.getString("image"),
@@ -152,7 +152,7 @@ public class Database {
             while (result.next()) {
                 ingredients.add(new Ingredient(
                     result.getString("name"),
-                    result.getString("quantity"),
+                    result.getInt("quantity"),
                     result.getString("unit")
                 ));
             }
@@ -176,7 +176,7 @@ public class Database {
                 String name = result.getString("name");
                 ingredients.add(new Ingredient(
                     name,
-                    result.getString("quantity"),
+                    result.getInt("quantity"),
                     result.getString("unit"),
                     Ingredient.isIngredientMissing(name, ownedIngredients)
                 ));
@@ -215,6 +215,52 @@ public class Database {
         return resultSet;
     }
     
+    // Inserts a user submitted recipe into the database
+    public static void insertNewRecipe(Recipe recipe) {
+        int id = getNewRecipeId();
+        String image = (recipe.getImage().isEmpty())
+            ? "http://i.insing.com.sg/cms/0f/d7/fa/7c/138122/MELT-Buffetspread.jpg"
+            : recipe.getImage();
+        final String insert = "INSERT INTO dishes VALUES "
+            + "(" + id + ", \'" + recipe.getName() + "\', \'" + recipe
+            .getDirections() + "\', \'" + image + "\');";
+        queryDatabase(insert);
+        insertIngredientsUsed(id, recipe.getIngredientList());
+    }
+    
+    private static void insertIngredientsUsed(int recipeId, List<Ingredient>
+        ingredientList) {
+        final StringBuilder insert =
+            new StringBuilder("INSERT INTO recipes VALUES ");
+        
+        ingredientList.forEach((ingredient ->
+            insert.append("(")
+                .append(recipeId)
+                .append(", ")
+                .append(ingredient.getId())
+                .append(", ")
+                .append(ingredient.getQuantity())
+                .append(", \'")
+                .append((ingredient.getUnit().equals("")) ? "unit" : ingredient.getUnit())
+                .append("\'),")
+        ));
+        
+        insert.replace(insert.length() - 1, insert.length(), ";");
+        queryDatabase(insert.toString());
+    }
+    
+    private static int getNewRecipeId() {
+        final String query =
+            "SELECT COUNT(*) AS idNum FROM dishes;";
+        ResultSet result = queryDatabase(query);
+        try {
+            return result.getInt("idNum") + 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
     // Converts a column from the result set to a string of elements,
     // separated by a comma
     private static String resultColumnToString(ResultSet result) {
@@ -222,7 +268,7 @@ public class Database {
         try {
             if (result.next()) sb.append(result.getString(1));
             while (result.next()) {
-                sb.append(", " + result.getString(1));
+                sb.append(", ").append(result.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
