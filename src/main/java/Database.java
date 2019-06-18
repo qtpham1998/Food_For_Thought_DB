@@ -201,20 +201,6 @@ public class Database {
         return DriverManager.getConnection(dbUrl, username, password);
     }
     
-    // Gets results from the database
-    private static ResultSet queryDatabase(String query) {
-        ResultSet resultSet = null;
-        try {
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
-            resultSet = stmt.executeQuery(query);
-            conn.close();
-        } catch (SQLException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return resultSet;
-    }
-    
     // Inserts a user submitted recipe into the database
     public static void insertNewRecipe(Recipe recipe) {
         int id = getNewRecipeId();
@@ -225,7 +211,7 @@ public class Database {
             + "(" + id + ", \'" + recipe.getName() + "\', \'" + recipe
             .getDirections() + "\', \'" + image +
             "\');";
-        queryDatabase(insert);
+        updateDatabase(insert);
         insertIngredientsUsed(id, recipe.getIngredientList());
     }
     
@@ -247,7 +233,7 @@ public class Database {
         ));
         
         insert.replace(insert.length() - 1, insert.length(), ";");
-        queryDatabase(insert.toString());
+        updateDatabase(insert.toString());
     }
     
     private static int getNewRecipeId() {
@@ -261,6 +247,32 @@ public class Database {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    // Gets results from the database
+    private static ResultSet queryDatabase(String query) {
+        ResultSet resultSet = null;
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            resultSet = stmt.executeQuery(query);
+            conn.close();
+        } catch (SQLException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return resultSet;
+    }
+    
+    // Gets results from the database
+    private static void updateDatabase(String query) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            conn.close();
+        } catch (SQLException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
     
     // Converts a column from the result set to a string of elements,
