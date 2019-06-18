@@ -223,7 +223,8 @@ public class Database {
             : recipe.getImage();
         final String insert = "INSERT INTO dishes VALUES "
             + "(" + id + ", \'" + recipe.getName() + "\', \'" + recipe
-            .getDirections() + "\', \'" + image + "\');";
+            .getDirections().replaceAll("\n", "\\n") + "\', \'" + image +
+            "\');";
         queryDatabase(insert);
         insertIngredientsUsed(id, recipe.getIngredientList());
     }
