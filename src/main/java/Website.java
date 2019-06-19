@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,13 +29,20 @@ public class Website extends HttpServlet {
             JSONArray likedRecipes =
                 fetchLikedRecipes(new JSONArray(req.getParameter("ids")));
             writer.print(likedRecipes);
-        } else if (param != null && param.equals("new")) {
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+        String param = req.getParameter("req");
+        if (param != null && param.equals("new")) {
             Database.insertNewRecipe(Recipe.decodeRecipe(
                 new JSONObject(req.getParameter("recipe"))
             ));
         }
     }
-
+    
     // Get matching recipes from owned ingredients, in JSON array form
     private JSONArray fetchMatchingRecipes(JSONArray ownedIngredients) {
         String ownedString = decodeOwnedIngrList(ownedIngredients);
