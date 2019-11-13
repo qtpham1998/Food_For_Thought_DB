@@ -69,4 +69,5 @@ public class Recipe {
         ingredientList.forEach(i -> jsonIngredients.add(i.encodeIngredient()));
         return new JSONArray(jsonIngredients);
     }
+
 }
